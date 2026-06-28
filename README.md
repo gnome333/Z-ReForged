@@ -11,7 +11,8 @@ Optional Discord RPC module for clients:
 Z-RF is some random shitty zcity fork
 made by novices in glua!!!!
 not vibecoded i think
+i don't know how to use git
 теперь на русском
 эта сборка делается ну совсем новичками
-на данный момент это просто сборка з сити без каких либо изменений
+на данный момент это просто сборка з сити без каких либо мажорных изменений
 гпт кода не будет 
