@@ -340,8 +340,9 @@ module[2] = function(owner, org, timeValue)
 		end
 	end
 
-	if o2[1] < 4 then
+	if o2[1] < 7 then
 		org.needotrub = true
+	    org.brain = math.Approach(0, 1, 10) -- позже всему более крутую систему сделаю как в прошлый раз
 	end
 
 	if org.lungsR[1] < 0.5 then
