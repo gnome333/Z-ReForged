@@ -1,412 +1,294 @@
-local max, min, Round, Lerp, halfValue2 = math.max, math.min, math.Round, Lerp, util.halfValue2
+local CurTime = CurTime
+local time
+local max, min, Round = math.max, math.min, math.Round
 --local Organism = hg.organism
-hg.organism.module.lungs = {}
-local module = hg.organism.module.lungs
+hg.organism.module.blood = {}
+local module = hg.organism.module.blood
+
+hg.organism.bloodtypes = {
+	["o-"] = {["o-"] = true,["o+"] = true,["a-"] = true,["a+"] = true,["b-"] = true,["b+"] = true,["ab-"] = true,["ab+"] = true},
+	["o+"] = {["o+"] = true,["a+"] = true,["b+"] = true,["ab+"] = true},
+	["a-"] = {["a+"] = true,["a-"] = true,["ab+"] = true,["ab-"] = true},
+	["a+"] = {["a+"] = true,["ab+"] = true},
+	["b-"] = {["b+"] = true,["b-"] = true,["ab+"] = true,["ab-"] = true},
+	["b+"] = {["b+"] = true,["ab+"] = true},
+	["ab-"] = {["ab+"] = true,["ab-"] = true},
+	["ab+"] = {["ab+"] = true},
+	["c-"] = {["c-"] = true,["o-"] = true,["o+"] = true,["a-"] = true,["a+"] = true,["b-"] = true,["b+"] = true,["ab-"] = true,["ab+"] = true},
+}
+
 module[1] = function(org)
-	org.lungsL = {
-		0, --состояние,пневмотаракс
-		0
-	}
+	org.blood = 5000
+	org.bleed = 0
+	org.internalBleed = 0
+	org.internalBleedHeal = 0
+	org.arteria = 0
+	org.rarmartery = 0
+	org.larmartery = 0
+	org.rlegartery = 0
+	org.llegartery = 0
+	org.spineartery = 0
+	org.bleedStart = 0
+	org.wounds = {}
+	org.arterialwounds = {}
+	org.wantToVomit = 0
+	org.vomitInThroat = nil
 
-	org.lungsR = {0, 0}
-	org.trachea = 0
-	org.pneumothorax = 0
-	org.needle = 0
-	org.nextCough = nil
-	org.o2 = {
-		range = 30,
-		regen = 4,
-		k = 0.5,
-	}
-
-	org.lungsfunction = true
-
-	org.o2.curregen = org.o2.regen
+	org.bloodtype = table.GetKeys(hg.organism.bloodtypes)[math.random(8)]
 	
-	org.o2[1] = org.o2.range
-	org.CO = 0
-	org.COregen = 0
-	org.lastCOBreathe = nil
+	if org.bloodtype == "c-" then
+		org.bloodtype = "o-" --эпик
+	end
 
-	org.mannitol = 0
+	org.hemotransfusionshock = 0
+
+	org.survivalchance = 1
 end
 
-function hg.organism.OxygenateBlood(org)
-	return (math.max(((1 - org.lungsL[1]) + (1 - org.lungsR[1])) / 2, 0.5) * (1 - org.trachea)) * org.o2.regen / 4 * (org.owner:WaterLevel() < 3 and 1 or 0)// * (1 - org.pneumothorax)
-end
+local internalbleed_phrases = {
+	"That's... that's blood I just vomited...",
+	"Oh, that's blood...",
+	"Fuck, I just puked blood...",
+	"Oh shit... I don't feel good...",
+}
 
-function hg.organism.CanBreath(org)
-	return org.o2 and org.o2.curregen >= org.losing_oxy
-end
+local about_to_puke = {
+	"I feel like I'm gonna puke any second now...",
+	"Not feeling good...",
+	"Gonna puke right now...",
+	"I want to vomit...",
+}
 
-local function insta_send_holdingbreath(org)
-	net.Start("organism_send") // отправляем только дизориентацию (чтобы не нагружать нет), и сразу
+local vecZero = Vector(0, 0, 0)
+module[2] = function(owner, org, mulTime)
+	local adrenaline = math.min(org.adrenaline, 2)
+
+	if org.vomitInThroat then
+		local ent = hg.GetCurrentCharacter(owner)
+		
+		local bon = "ValveBiped.Bip01_Head1"
+		local bone = ent:LookupBone(bon)
+		local mat = ent:GetBoneMatrix(bone)
 	
-	local tbl = {}
-	tbl.holdingbreath = org.holdingbreath
-	tbl.owner = org.owner
+		if mat and mat:GetAngles():Right()[3] < 0.25 then
+			org.vomitInThroat = nil
 
-	net.WriteTable(tbl)
-	net.WriteBool(true)
-	net.WriteBool(false)
-	net.WriteBool(false)
-	net.WriteBool(true) // вот эта шняга отвечает за то чтобы оно просто мерджнуло и всё
-	net.Send(org.owner)
-end
+			net.Start("bloodsquirt2")
+			net.WriteEntity(ent)
+			net.WriteString(bon)
+			net.WriteMatrix(mat)
+			net.WriteVector(mat:GetTranslation() + mat:GetAngles():Right() * 6 + mat:GetAngles():Forward() * 1)
+			net.WriteVector(mat:GetAngles():Right() * 2 * math.Clamp(org.pulse / 70, 0.4, 1))
+			net.Broadcast()
 
-local function togglebreath(ply, toggle)
-	local org = ply.organism
-	
-	if isbool(toggle) then
-		if toggle then
-			if not ply.organism.holdingbreath then
-				ply.organism.holdingbreath = true
-				ply:EmitSound(ThatPlyIsFemale(ply) and "breathing/inhale/female/inhale_0"..math.random(5)..".wav" or "breathing/inhale/male/inhale_0"..math.random(4)..".wav",65)	
-				insta_send_holdingbreath(ply.organism)
-			end
-		else
-			if ply.organism.holdingbreath then
-				ply:EmitSound(ThatPlyIsFemale(ply) and "breathing/exhale/female/exhale_0"..math.random(5)..".wav" or "breathing/exhale/male/exhale_0"..math.random(5)..".wav",65)
-				ply.organism.holdingbreath = false
-				ply.releasebreathe = nil
-				insta_send_holdingbreath(ply.organism)
-			end
-		end
-	else
-		if ply.organism.holdingbreath then
-			ply:EmitSound(ThatPlyIsFemale(ply) and "breathing/exhale/female/exhale_0"..math.random(5)..".wav" or "breathing/exhale/male/exhale_0"..math.random(5)..".wav",65)
-			ply.organism.holdingbreath = false
-			ply.releasebreathe = nil
-			insta_send_holdingbreath(ply.organism)
-		else
-			ply.organism.holdingbreath = true
-			ply:EmitSound(ThatPlyIsFemale(ply) and "breathing/inhale/female/inhale_0"..math.random(5)..".wav" or "breathing/inhale/male/inhale_0"..math.random(4)..".wav",65)	
-			insta_send_holdingbreath(ply.organism)
+			ent:EmitSound("vomit/vomit5.mp3")
 		end
 	end
 
-	local ent = hg.GetCurrentCharacter(ply)
-	ent:StopSound(ply.lastPhr or "")
-	ply.phrCld = 0
+	if org.isPly and not org.otrub and org.blood < 2900 then org.owner:Notify(math.random(2) == 1 and "I cant feel anything..." or (math.random(2) == 1 and "I think I'm gonna faint right now...") or "I dont feel so good...",60,"blood2",0) end
+
+	if org.internalBleed < 0.5 and org.bleed < 0.05 and org.pulse > 5 then
+		org.blood = min(org.blood + mulTime * 5 * (adrenaline * 1.5 + 1) * (org.satiety / 100 + 1) * org.pulse / 70, 5000)
+	end
+
+	if org.hemotransfusionshock > 0 then
+		org.hemotransfusionshock = math.max(org.hemotransfusionshock - mulTime / 200,0)
+		org.internalBleed = org.internalBleed + mulTime / 30
+	end
+
+	if org.arteria == 1 then
+		org.o2[1] = math.max(org.o2[1] - mulTime * 5,0)
+	end
+
+	org.consciousness = math.min(org.consciousness, math.min(org.blood / 3000, 1) * math.Clamp(((org.temperature < 30 and org.temperature - 30 or 0) * 0.25 + 1), 0.25, 1))
+
+	local beatsPerSecond = max(min(60 / math.max(org.pulse,2) / (org.bleed / 15), 7), 0.3)
+	time = CurTime()
+
+	local coagulatespeed = 0
+	local bleedoutspeed = 0
+	if #org.wounds > 0 then
+		local ent = IsValid(owner.FakeRagdoll) and owner.FakeRagdoll or owner
+		
+		for i, wound in pairs(org.wounds) do
+			local rand1 = math.Rand(4, 10) * 1
+			local rand2 = math.Rand(0.5, 1) * 1
+			local bleed = rand1 * wound[1] * mulTime * math.max(org.pulse, 20) / 70 * 2.0 * (1 - math.min(adrenaline / 6, 0.5)) * org.bleedingmul * 0.02
+			local coagulate = 2 * mulTime * rand2 * (adrenaline * 0.1 + 1) * 0.04-- / #org.wounds
+			bleedoutspeed = bleedoutspeed + bleed / rand1 * 3--we pray for the luck of it being in the center
+			coagulatespeed = coagulatespeed + coagulate / rand2 * 1
+			
+			local rand = math.Rand(0, 2) * 2
+			//if wound[5] + beatsPerSecond * 2 < time then
+				wound[5] = time
+				org.blood = max(org.blood - bleed, 1)
+				
+				if (owner:IsPlayer() and owner:Alive()) or not owner:IsPlayer() then
+					hg.organism.BloodDroplet2(owner, org, wound, ent:GetVelocity() + VectorRand(-15, 15), false)
+					wound[1] = max(wound[1] - coagulate, 0)
+				end
+
+				if wound[1] == 0 then table.remove(org.wounds, i) owner:SetNetVar("wounds",org.wounds) end
+			//end
+		end
+	end
+
+	if org.heart == 1 then
+		org.blood = math.max(org.blood - mulTime * 100 * org.pulse / 70,0)
+		bleedoutspeed = bleedoutspeed + mulTime * 100 * org.pulse / 70
+	end
+
+	if org.liver > 0.5 then
+		//org.blood = math.max(org.blood - mulTime * 10 * org.pulse / 70 * org.liver,0)
+		//bleedoutspeed = bleedoutspeed + mulTime * 10 * org.pulse / 70 * org.liver
+	end
+
+	bleedoutspeed = bleedoutspeed / (beatsPerSecond + 2)
+
+	local bleedoutspeed2 = 0
+	local next_arterypump = 1 / math.max(org.pulse, 10)
+	local ent = owner:IsPlayer() and IsValid(owner.FakeRagdoll) and owner.FakeRagdoll or owner
+	for i, wound in pairs(org.arterialwounds) do
+		bleedoutspeed2 = bleedoutspeed2 + wound[1] * mulTime * 0.2 * math.max(org.pulse, 20) / 80
+
+		if wound[5] + next_arterypump * 2 < time then
+			local pos, ang = ent:GetBonePosition(ent:LookupBone(wound[4]))
+			wound[5] = time
+			org.blood = max(org.blood - wound[1] * mulTime * 4.5 * math.max(org.pulse, 20) / 80, 1)
+			if (owner:IsPlayer() and owner:Alive()) or not owner:IsPlayer() then
+				local dir = wound[6]
+				local len = dir:Length()
+				local _, dir = LocalToWorld(vecZero, dir:Angle(), vecZero, ang)
+				dir = -dir:Forward() * len
+				hg.organism.BloodDroplet2(owner, org, wound, owner:GetVelocity() + VectorRand(-10, 10) + dir, true)
+			end
+
+			if wound[1] == 0 then
+				table.remove(org.arterialwounds, i)
+				owner:SetNetVar("arterialwounds", org.arterialwounds)
+
+				org[wound[7]] = 0
+			end
+		end
+	end
+	bleedoutspeed2 = bleedoutspeed2 / next_arterypump
+
+	if org.blood < (2400 / (adrenaline / 3 + 1)) * ((math.cos(CurTime()/2) + 1) / 2 * 0.1 + 1) then org.needotrub = true end
+
+	local bleed = org.internalBleed / 14 -- + org.lungsR[3] + org.lungsL[3]
+	org.internalBleed = math.Approach(org.internalBleed, 0, org.internalBleedHeal > 0 and mulTime / 2 or mulTime / 55)
+	coagulatespeed = coagulatespeed + mulTime
+	org.internalBleedHeal = math.Approach(org.internalBleedHeal, 0, mulTime / 2)
+	
+	if bleed > 0 then org.blood = max(org.blood - bleed * mulTime * 10 * org.pulse / 70, 1) end
+	
+	if (org.internalBleed > 1 or org.pneumothorax > 0) and org.blood > 2000 and org.o2[1] > 0 then
+		org.wantToVomit = org.wantToVomit or 0
+
+		org.wantToVomit = org.wantToVomit + math.Rand(0, org.internalBleed / 1000 + org.pneumothorax / 200) * mulTime * 5
+		
+		if org.wantToVomit > 0.90 then
+			//owner:Notify(about_to_puke[math.random(#about_to_puke)], 15, "internalbleed_pre")
+		end
+	end
+
+	if org.wantToVomit > 1 then
+		org.wantToVomit = 0
+
+		if org.isPly then owner:Notify(internalbleed_phrases[math.random(#internalbleed_phrases)], 15, "internalbleed") end
+
+		hg.organism.Vomit(owner)
+	end
+
+	org.bleed = (bleedoutspeed + bleedoutspeed2 + bleed)--в секунду
+	
+	local timetouncon = (org.blood - 2500) / org.bleed
+	
+	local bleeding_will_stop = (timetouncon ~= timetouncon) or ((coagulatespeed * timetouncon - org.bleed) > 0)
+	local canwakeup_pain = ((org.pain - 5) / (org.painlessen)) < timetouncon
+	org.timetouncon = (timetouncon ~= timetouncon) and timetouncon or Lerp(hg.lerpFrameTime2(0.01,mulTime), org.timetouncon or 10000, timetouncon)
+	
+	if org.otrub and ((not bleeding_will_stop and not (canwakeup_pain and org.blood > 3000)) or (org.brain > 0.4) or (org.pulse < 15) or (org.o2[1] < 5) or (org.trachea >= 0.5) or org.heartstop or (org.spine3 >= hg.organism.fake_spine3) or (org.spine2 >= hg.organism.fake_spine2)) then
+		org.incapacitated = true
+	else
+		org.incapacitated = false
+	end
+
+	if (org.brain > 0.4) or (org.heart > 0.6) or (org.trachea >= 0.6) then
+		org.critical = true
+	else
+		org.critical = false
+	end
+
+	org.bleed = (bleedoutspeed + bleedoutspeed2)
+
+	if org.blood < 500 then
+	org.brain = math.Approach(0, 1, 10)
+    end
 end
 
-concommand.Add("hmcd_holdbreath",function(ply)
-	if not ply.organism then return end
-	if not ply:Alive() then return end
-	if ply.organism.stamina[1] < 90 then return end
-	if ply.organism.o2.curregen == 0 then return end
+util.AddNetworkString("bloodsquirt2")
 
-	if (ply.cooldownbreathe or 0) > CurTime() then return end
-	ply.cooldownbreathe = CurTime() + 0.5
-
-	togglebreath(ply)
-end)
-
-concommand.Add("+hmcd_holdbreath",function(ply)
-	if not ply.organism then return end
-	if not ply:Alive() then return end
-	if ply.organism.stamina[1] < 90 then return end
-	if ply.organism.o2.curregen == 0 then return end
-
-	if (ply.cooldownbreathe or 0) > CurTime() then return end
-	ply.cooldownbreathe = CurTime() + 0.5
-
-	togglebreath(ply,true)
-end)
-
-concommand.Add("-hmcd_holdbreath",function(ply)
-	if not ply.organism then return end
-	if ply.organism.stamina[1] < 90 then return end
-	if ply.organism.o2.curregen == 0 then return end
-
-	if (ply.cooldownbreathe or 0) > CurTime() then ply.releasebreathe = ply.cooldownbreathe return end
-
-	togglebreath(ply,false)
-end)
-
-local lowoxy = {
-	"I'm gonna faint right now... There's not enough oxygen.",
-	"There's not enough oxygen... I can't hold much longer...",
-	"I really need some fresh air...",
-	"I'm gasping for air...",
-	"Need to breathe air... or I'm gonna faint right here..."
-}
-
-local not_enough_intake = {
-	//"I have to breathe...",
-	//"I gotta take a break...",
-	//"Need a break from this... to breathe...",
-	//"Resting sounds like a nice idea.",
-	"I need to breathe...",
-	"I'm struggling to breathe...",
-}
-
-local drop_mask = {
-	"I can't breathe in this mask... I need to take it off.",
-	"Drop the mask, it's not worth it...",
-	"It's fucking disgusting... and I surely can't breathe in this...",
-	"Fucking stinks... Gotta take this mask off...",
-}
-
-local drugged = {
-	"Ohhh hohoohoooo Ie-like it.....",
-	"Fukkenh awesomee..... ffffeeelin gooooood..",
-	"That's theh sStuffff DUDeeee",
-	"I reallly like whatEvER I'm feeling right now....",
-	"Oh yeahhhh this feels gooood!",
-	"I want to feel likhe this for theRRRREST of my life",
-	"Why am I here even?.. wWhatever whuhhh heh",
-	"Whoa re you? Gett outtaheree...",
-	"Don't want anything else... this is pERRRfect!..",
-}
-
-local bit_band,util_PointContents = bit.band,util.PointContents
-
-local color_white, color_red, color_red2, color_red3 = Color(255, 255, 255), Color(255, 0, 0), Color(200, 55, 55), Color(255, 100, 100)
-module[2] = function(owner, org, timeValue)
-	local o2 = org.o2
-	local losing_oxy = timeValue * 1 * math.Clamp(org.o2[1] / 30, 0.25, 1)
-	org.losing_oxy = losing_oxy
-	o2[1] = max(o2[1] - losing_oxy, 0)
+function hg.organism.Vomit(owner, snd)
+	if !hg.IsValidPlayer(owner) then return end
+	
+	local org = owner.organism
+	org.blood = math.max(org.blood - 200, 0)
 	local ent = hg.GetCurrentCharacter(owner)
-	local bone = ent:LookupBone("ValveBiped.Bip01_Head1")
 
-	if (not bone) or (bone < 0) then bone = 6 end
+	local bon = "ValveBiped.Bip01_Head1"
+	local bone = ent:LookupBone(bon)
+	local mat = ent:GetBoneMatrix(bone)
 
-	local head = ent:GetBonePosition(bone)
-	
-	if not head then
-		head = ent:GetBonePosition(0)
+	if not mat then return end
+
+	local on_spine = mat:GetAngles():Right()[3] > 0.25
+	if on_spine then
+		org.vomitInThroat = true
 	end
 
-	if org.o2.curregen == 0 and org.holdingbreath then
-		togglebreath(owner, false)
-	end
+	owner:SetNetVar("vomiting", CurTime() + 1.5)
 
-	if org.holdingbreath then
-		//org.stamina[1] = max(org.stamina[1] - timeValue * 15,0)
-		if org.stamina[1] < 90 or org.o2[1] <= 10 then
-			togglebreath(owner, false)
-		end
-		
-		if owner.releasebreathe and owner.releasebreathe < CurTime() then
-			togglebreath(owner, false)
-			owner.releasebreathe = nil
-		end
-	end
-
-	if not head then head = owner:GetPos() end
+	ent:EmitSound(snd or "zcitysnd/real_sonar/"..(ThatPlyIsFemale(ent) and "female" or "male").."_cough"..math.random(4)..".mp3")
+	if !on_spine then ent:EmitSound("vomit/vomit5.mp3") end
 	
-	local inwater = bit_band(util_PointContents(head),CONTENTS_WATER) == CONTENTS_WATER
-	-- test
-	local success = owner:IsBerserk() or (not org.heartstop and org.alive and not (org.brain >= 0.4 and math.random(10 - (org.brain * 10)) < 4) and org.lungsfunction)
-	if success and owner:IsPlayer() and inwater then success = false end
-	if success and org.choking then org.needfake = true success = false end
-	if success and org.vomitInThroat then success = false end
-	org.choking = false
-	local pneumothorax = (org.lungsR[2] == 1 or org.lungsL[2] == 1) and org.needle == 0
-	
-	org.needle = math.Approach(org.needle, 0, timeValue / 1200)
-
-	org.pneumothorax = pneumothorax and min(org.pneumothorax + timeValue / 180 * (org.lungsL[2] + org.lungsR[2]), (org.lungsL[2] + org.lungsR[2]) / 2) or max(org.pneumothorax - timeValue / 10, 0)
-	
-	if org.lastCOBreathe and org.lastCOBreathe + 1 > CurTime() then
-		org.COregen = math.Approach(org.COregen, 30, timeValue * 1)
+	if owner.armors and owner.armors.face and hg.armor.face[owner.armors.face].voice_change then
+		owner:SetNetVar("zableval_masku", true)
 	else
-		org.COregen = math.Approach(org.COregen, 0, timeValue * 0.5)
-	end
-
-	org.CO = max(org.CO - timeValue, 0)
-	if success then
-		local oxygenate = hg.organism.OxygenateBlood(org) * 0.5
-		local lerp = min(max(org.pulse - 20, 0) / 20, 1)
-		local regen = Lerp(lerp, 0, o2.regen * oxygenate * math.Rand(0.95, 1.05))
-
-		org.CO = min(org.CO + (org.COregen > 0 and timeValue * 1.5 or 0), 30)
-
-		org.consciousness = math.min(org.consciousness, (30 - org.CO) / 30)
-
-		local mask_blevota = owner:GetNetVar("zableval_masku", false)
-
-		local sprayed = org.is_sprayed_at
-		org.is_sprayed_at = nil
-
-		local regenerate = regen * timeValue * 4 * (org.stamina[1] / org.stamina.max) * (mask_blevota and 0 or 1) * ((org.temperature > 38) and math.Clamp(math.Remap(org.temperature, 38, 41, 1, 0.1), 0.1, 1) or 1)
-		o2[1] = min(o2[1] + regenerate * math.Clamp(org.o2[1] / 30, 0.25, 1) * (org.holdingbreath and 0 or 1) * (sprayed and 0 or 1) * min((10 / max(org.CO,1)),1), o2.range * math.max(1 - org.pneumothorax * org.pneumothorax, 0.1) * math.min(org.blood / 4500, 1) * math.max(1 - (org.lungsL[1] + org.lungsR[1]) / 2, 0.5))
-
-		o2.curregen = regenerate
-
-		o2[1] = max(o2[1] - (org.CO > 0 and o2.curregen * 1.1 * (org.CO / 30) or 0),0)
-
-		//org.owner:ResetNotification("oxygen_cantbreathe")
-		//org.owner:ResetNotification("oxygen_cantbreathe2")
-	else
-		o2.curregen = 0
-	end
-
-	if owner:IsBerserk() then
-		o2[1] = math.max(5, o2[1])
-	end
-	
-	if org.isPly and not org.otrub and o2.curregen < losing_oxy and org.analgesia <= 1.5 and !org.heartstop then
-		if mask_blevota then
-			if o2[1] < 15 then
-				org.owner:Notify("DROP THE FUCKING MASK", 25, "take_gasmask2", 0, nil, color_red2)
-			else
-				org.owner:Notify(drop_mask[math.random(#drop_mask)], 15, "take_gasmask", 0)
-			end
-		else
-			if o2[1] < 25 and o2[1] > 12 then
-				org.owner:Notify(not_enough_intake[math.random(#not_enough_intake)], 61, "oxygen_lowintake", 0)
-			end
-		end
-
-		if o2[1] < 12 then
-			org.owner:Notify(lowoxy[math.random(#lowoxy)], 30, "lowoxy", 0, nil, color_red3)
-	
-			if o2[1] < 6 then
-				org.owner:Notify("Oxygen... please...", 30, "lowoxy2", 0, nil, color_red)
-			end
+		if !on_spine then
+			net.Start("bloodsquirt2")
+			net.WriteEntity(ent)
+			net.WriteString(bon)
+			net.WriteMatrix(mat)
+			net.WriteVector(mat:GetTranslation() + mat:GetAngles():Right() * 6 + mat:GetAngles():Forward() * 1)
+			net.WriteVector(mat:GetAngles():Right() * 2 * math.Clamp(org.pulse / 70, 0.4, 1))
+			net.Broadcast()
 		end
 	end
+end
 
-	if org.analgesia > 1.5 then
-		org.owner:Notify(drugged[math.random(#drugged)], 30, "drugged", 0, nil, color_white)
+function hg.organism.CoughBlood(org)
+	local ply = org.owner
+	local phr = "zcitysnd/real_sonar/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "_cough" .. math.random(4) .. ".mp3"
+	ply:EmitSound(phr)
+	ply.phrCld = CurTime() + 2
+	ply.lastPhr = phr
+
+	if math.random(5) == 1 then
+		org.vomitInThroat = nil
+
+		net.Start("bloodsquirt2")
+		net.WriteEntity(ent)
+		net.WriteString(bon)
+		net.WriteMatrix(mat)
+		net.WriteVector(mat:GetTranslation() + mat:GetAngles():Right() * 6 + mat:GetAngles():Forward() * 1)
+		net.WriteVector(mat:GetAngles():Right() * 2 * math.Clamp(org.pulse / 70, 0.4, 1))
+		net.Broadcast()
+
+		ent:EmitSound("vomit/vomit5.mp3")
 	end
+end
 
-	if org.analgesia > 1.5 or org.painkiller > 2.4 then
-		if math.Rand(0, 500) < (org.analgesia + org.painkiller) then
-			//org.lungsfunction = false
-		end
-	end
-
-	if o2[1] == 0 then
-		if math.random(50) == 1 then
-			org.lungsfunction = false
-		end
-	else
-		if math.random(50) == 1 then
-			org.lungsfunction = true
-		end
-	end
-
-	if (org.lungsL[1] == 1 and org.lungsR[1] == 1) or org.heartstop then
-		org.lungsfunction = false
-	end
-
-	--[[if (pneumothorax or org.trachea >= 0.6 or org.lungsR[1] >= 0.6 or org.lungsL[1] >= 0.6) and org.alive and o2[1] > 0 then
-		local timeSub = org.pneumothorax + org.trachea + org.lungsR[1] + org.lungsL[1]
-		org.nextCough = org.nextCough and org.nextCough or (CurTime() + 5)
-		
-		if org.nextCough < CurTime() then
-			org.nextCough = CurTime() + math.random(15,30 - timeSub + math.max(10 - o2[1],0))
-			owner:EmitSound("homigrad/player/male/male_cough"..math.random(5)..".wav",50 + Round(timeSub * 2.5))
-		end
-	end--]]
-
-	if org.isPly then
-		if org.pneumothorax > 0 then
-			org.owner:Notify("I can feel something filling my lungs.", true, "pneumothorax1",10) // delay of 10 seconds before typing that
-		else
-			org.owner:ResetNotification("pneumothorax1")
-		end
-
-		if org.pneumothorax > 0.3 then
-			org.owner:Notify("It's getting harder to breathe.", true, "pneumothorax2", 5)
-		else
-			org.owner:ResetNotification("pneumothorax2")
-		end
-
-		if org.pneumothorax > 0.5 then
-			org.owner:Notify("I'm really struggling to breathe.", true, "pneumothorax3", 5)
-		else
-			org.owner:ResetNotification("pneumothorax3")
-		end
-	end
-
-	local k = halfValue2(o2[1], o2.range, o2.k)
-
-	if o2[1] < 10 then
-		if org.isPly then
-			hg.StunPlayer(owner, 3)
-		end
-	end
-
-	if o2[1] < 12 then
-		org.needfake = true
-
-		if org.isPly then
-			hg.LightStunPlayer(owner, 3)
-		end
-	end
-
-	if o2[1] < 7 then
-		org.needotrub = true
-	    org.brain = math.Approach(0, 1, 10) -- позже всему более крутую систему сделаю как в прошлый раз
-	end
-
-	if org.lungsR[1] < 0.5 then
-		//org.lungsR[1] = max(org.lungsR[1] - timeValue / 240, 0)
-	end
-
-	if org.lungsL[1] < 0.5 then
-		//org.lungsL[1] = max(org.lungsL[1] - timeValue / 240, 0)
-	end
-
-	if owner:IsBerserk() then
-		org.brain = math.min(0.5, org.brain)
-	end
-
-	if org.skull >= 0.6 then k = 0 end
-	if org.brain >= 0.6 then k = 0 end
-
-	if org.skull < 1 and org.skull >= 0.5 and org.bandagedskull then
-		org.skull = math.Approach(org.skull, 0, timeValue / 600)
-	end
-
-	if org.brain >= 0.3 then
-		if org.brain >= 0.5 then
-			if math.random(60) == 1 then
-				org.heartstop = true
-			end
-		end
-
-		if org.brain > 0.35 and !org.heartstop then
-			if math.random(60) == 1 then
-				org.lungsfunction = true
-			end
-		end
-
-		org.needotrub = true
-	end
-
-	local death_from_braindamage = false
-	if org.brain >= 0.7 and org.alive then
-		death_from_braindamage = true
-		org.alive = false
-	end
-
-	if org.skull == 1 then org.brain = min(org.brain + timeValue / 1000, 1) end
-
-	if org.isPly then
-		if org.brain > 0.1 and org.brain < 0.3 then
-			org.owner:Notify(math.random(2) == 1 and "My head hurts..." or "Where am I?", true, "brain", 5)
-		else
-			org.owner:ResetNotification("brain") 
-		end
-	end
-
-	org.brain = max(org.brain - timeValue / 400 * ((org.mannitol > 0 and org.brain < 0.6) and 1 or (org.brain > 0.1 and 0.1 or 0)), 0)
-	org.mannitol = math.Approach(org.mannitol, 0, timeValue / 200)
-	
-	if k < 0.25 then
-		if not org.alive and owner:IsPlayer() and death_from_braindamage and org.o2[1] == 0 then
-			hg.achievements.AddPlayerAchievement(owner,"brain",1)
-			if org.analgesia > 1 then
-				hg.achievements.AddPlayerAchievement(owner,"drugs",1)
-			end
-		end
-		
-		org.brain = min(org.brain + timeValue / (org.brain < 0.3 and 300 or 120) * math.min(((org.o2[1] < 0.25 and 1 or 0) + org.skull), 1), 1)
-	end --~120 seconds to fully die (0.3 of 300 and 0.4 of 60 seconds after)
+function hg.organism.BloodDroplet2(owner, org, wound, dir, artery)
+	hook.Run("HG_BloodParticleStartedDropping", owner, org, wound, dir, artery)
 end
