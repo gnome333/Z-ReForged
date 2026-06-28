@@ -849,7 +849,7 @@ hook.Add("OnEntityWaterLevelChanged", "ClearBlood", function(ent, old, new)
 end)
 
 hook.Add("HomigradDamage", "HeadshotRega", function(ply, dmgInfo, hitgroup, ent)
-    if hitgroup == HITGROUP_HEAD and dmgInfo:IsBulletDamage() or dmgInfo:IsExplosionDamage() then
+    if hitgroup == HITGROUP_HEAD and dmgInfo:IsBulletDamage() or dmgInfo:IsExplosionDamage() then -- приоритет говно пох
         ply.organism.brain = 1
     end
 end)
