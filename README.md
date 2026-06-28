@@ -8,6 +8,6 @@ Optional Discord RPC module for clients:
 2. https://github.com/fluffy-servers/gmod-discord-rpc/releases/tag/1.2.1
 
 # Z-ReForged
-Z-RF is a some random shitty zcity fork
+Z-RF is some random shitty zcity fork
 made by novices in glua!!!!
 not vibecoded i think
