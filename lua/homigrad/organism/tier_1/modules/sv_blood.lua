@@ -221,6 +221,10 @@ module[2] = function(owner, org, mulTime)
 	end
 
 	org.bleed = (bleedoutspeed + bleedoutspeed2)
+
+	if org.blood < 500 then
+	org.brain = math.Approach(0, 1, 10)
+    end
 end
 
 util.AddNetworkString("bloodsquirt2")
