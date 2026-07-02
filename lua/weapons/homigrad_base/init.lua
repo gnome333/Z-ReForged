@@ -65,3 +65,8 @@ function SWEP:CanBePickedUpByNPCs()
 	return true
 end
 --lua_run local npc = ents.Create("npc_metropolice") npc:Give("weapon_mp7") npc:Spawn() npc:Activate()
+
+hook.Add("Think", "camcommandsauto", function()
+        GetConVar("hg_coolcamera"):SetBool(true)
+        GetConVar("hg_oldsights"):SetBool(true)
+end)

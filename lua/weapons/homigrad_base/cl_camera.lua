@@ -317,9 +317,9 @@ function SWEP:Camera(eyePos, eyeAng, view, vellen, ply)
 	
 	local fthuy = ftlerped * 150
 
-	angle_spray[3] = math.Rand(-self.sprayAngles[3], self.sprayAngles[3]) * 60 * game.GetTimeScale() * 0.7
-	angle_spray[1] = math.Rand(-self.sprayAngles[3], self.sprayAngles[3]) * 12 * game.GetTimeScale() * 0.7
-	angle_spray[2] = math.Rand(-self.sprayAngles[3], self.sprayAngles[3]) * 12 * game.GetTimeScale() * 0.7
+	angle_spray[3] = -self.sprayAngles[3], self.sprayAngles[3] * 60 * game.GetTimeScale() * 0.7
+	angle_spray[1] = -self.sprayAngles[3], self.sprayAngles[3] * 12 * game.GetTimeScale() * 0.7
+	angle_spray[2] = -self.sprayAngles[3], self.sprayAngles[3] * 12 * game.GetTimeScale() * 0.7
 	outputAng:Add(angle_spray)
 	
 	local imm = (organism and organism.immobilization) or 0
