@@ -772,7 +772,7 @@ function SWEP:MultiplyDMG(owner, ent, vellen, mul)
     local vbftotal = vbf1 * vbf2 * 0.00008 -- финальный фактор
     mul = mul * 1 / math.Clamp((180 - owner.organism.stamina[1]) / 90,1,1.3)
     mul = mul * math.Clamp(vbftotal, 0.9, 3)
-    mul = mul * (ent ~= owner and 0.75 or 1)
+    -- mul = mul * (ent ~= owner and 0.75 or 1)
     mul = mul * (owner.MeleeDamageMul or 1)
 
     if owner.organism.superfighter then
@@ -1159,7 +1159,7 @@ function SWEP:CustomThink()
 
             local shouldhit = (IsValid(ent) or ent:IsWorld())
 
-            local dmg = math.random(self.DamagePrimary - 3, self.DamagePrimary + 3)
+            local dmg = (self.weight) + (self.DamagePrimary - self.DamageSecondary) * 1.8--math.random(self.DamagePrimary - 3, self.DamagePrimary + 3)
 
             local soft = self:IsEntSoft(ent)
             if !shouldhit then
