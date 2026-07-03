@@ -767,7 +767,7 @@ if CLIENT then
 end
 
 function SWEP:MultiplyDMG(owner, ent, vellen, mul)
-    local vbf1 = vellen / (self.weight) -- скорость об вес 
+    local vbf1 = vellen / (self.weight * 0.5) -- скорость об вес 
     local vbf2 = self.AttackLen1 + (self.AttackLen2) -- вдыдмыддд
     local vbftotal = vbf1 * vbf2 * 0.00008 -- финальный фактор
     mul = mul * 1 / math.Clamp((180 - owner.organism.stamina[1]) / 90,1,1.3)
