@@ -1159,7 +1159,9 @@ function SWEP:CustomThink()
 
             local shouldhit = (IsValid(ent) or ent:IsWorld())
 
-            local dmg = (self.weight) + (self.DamagePrimary - self.DamageSecondary) * 1.8--math.random(self.DamagePrimary - 3, self.DamagePrimary + 3)
+            local dmg = self.DamagePrimary - self.weight -- окк...
+            -- (self.weight) + (self.DamagePrimary - self.DamageSecondary) * 1.4 -- mб буду менять хзхз
+            --math.random(self.DamagePrimary - 3, self.DamagePrimary + 3) сверху
 
             local soft = self:IsEntSoft(ent)
             if !shouldhit then
@@ -1299,7 +1301,7 @@ function SWEP:CustomThink()
 
             local shouldhit = (IsValid(ent) or ent:IsWorld())
 
-            local dmg = math.random(self.DamageSecondary - 3, self.DamageSecondary + 3)
+            local dmg = self.DamageSecondary - self.weight
 
             if !shouldhit then
                 goto meleeskip2
