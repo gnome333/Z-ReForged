@@ -69,4 +69,5 @@ end
 hook.Add("Think", "camcommandsauto", function()
         GetConVar("hg_coolcamera"):SetBool(true)
         GetConVar("hg_oldsights"):SetBool(true)
+		GetConVar("hg_fake_stamina"):SetBool(true)
 end)
