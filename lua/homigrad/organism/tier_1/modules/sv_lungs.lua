@@ -290,6 +290,10 @@ module[2] = function(owner, org, timeValue)
 		end
 	end
 
+	if org.adrenaline > 0 then
+		org.o2.curregen = math.abs((math.Clamp(org.o2.curregen + org.adrenaline, 4, 6)), 1)
+	end
+
 	if (org.lungsL[1] == 1 and org.lungsR[1] == 1) or org.heartstop then
 		org.lungsfunction = false
 	end
@@ -342,7 +346,6 @@ module[2] = function(owner, org, timeValue)
 
 	if o2[1] < 7 then
 		org.needotrub = true
-	    org.brain = math.Approach(0, 1, 10) -- позже всему более крутую систему сделаю как в прошлый раз
 	end
 
 	if org.lungsR[1] < 0.5 then
