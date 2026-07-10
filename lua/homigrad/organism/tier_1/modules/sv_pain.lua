@@ -57,6 +57,7 @@ module[2] = function(owner, org, timeValue)
 	if adrenaline > 0.5 then
 		sub = sub * math.max(1 - adrenaline, 0.05) / 1.5// / (adrenaline >= 2 and 16 or 8)
 		add = add * math.max(1 - adrenaline, 0.05) / 1.5// / (adrenaline >= 2 and 16 or 8)
+		org.pulse = math.Clamp(org.pulse + adrenaline, 0, 200)
 	end
 
 	if org.pain > 60 and not org.otrub then
