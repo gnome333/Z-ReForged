@@ -54,10 +54,10 @@ module[2] = function(owner, org, timeValue)
 	local add = math.min(timeValue * 20, org.painadd)
 	local sub = (add <= 0.2) and (timeValue * 2 * (org.otrub and 2 or 1) + timeValue * (org.painkiller * 2) + timeValue * (org.analgesia * 4)) or (0)
 
-	if adrenaline > 1 then
-		sub = sub * math.max(0.3 - adrenaline, 0.02) / 1// / (adrenaline >= 2 and 16 or 8)
-		add = add * math.max(0.6 - adrenaline, 0.04) / 1// / (adrenaline >= 2 and 16 or 8)
-	end
+    if adrenaline > 1 then
+        add = add * math.Clamp(1 - adrenaline * 0.2, 0.1, 1)
+        sub = sub * math.Clamp(1 - adrenaline * 0.05, 0.7, 1)
+    end
 
 	if org.pain > 60 and not org.otrub then
 		add = add / 5
