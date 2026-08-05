@@ -73,9 +73,7 @@ local function legs(org, bone, dmg, dmgInfo, key, boneindex, dir, hit, ricochet)
 	local oldDmg = org[key]
 	local dmg = dmg * 4
 
-	print("DMG: " .. dmg)
-
-	if dmgInfo:IsDamageType(DMG_CRUSH) or dmgInfo:IsDamageType(DMG_BUCKSHOT) and not dmgInfo:IsDamageType(DMG_BULLET) and dmg > 15 and not org[key.."amputated"] then
+	if (dmgInfo:IsDamageType(DMG_CRUSH) or (dmgInfo:IsDamageType(DMG_BUCKSHOT) and not dmgInfo:IsDamageType(DMG_BULLET))) and not dmgInfo:IsDamageType(DMG_FALL) and dmg > 60 and not org[key.."amputated"] then
 		hg.organism.AmputateLimb(org, key)
 
 		return 0
@@ -131,9 +129,10 @@ end
 local function arms(org, bone, dmg, dmgInfo, key, boneindex, dir, hit, ricochet)
 	local oldDmg = org[key]
 	local dmg = dmg * 4
-	
-	if dmgInfo:IsDamageType(DMG_CRUSH) or dmgInfo:IsDamageType(DMG_BUCKSHOT) and not dmgInfo:IsDamageType(DMG_BULLET) and dmg > 15 and not org[key.."amputated"] then
+    
+	if (dmgInfo:IsDamageType(DMG_CRUSH) or (dmgInfo:IsDamageType(DMG_BUCKSHOT) and not dmgInfo:IsDamageType(DMG_BULLET))) and not dmgInfo:IsDamageType(DMG_FALL) and dmg > 80 and not org[key.."amputated"] then
 		hg.organism.AmputateLimb(org, key)
+		print("DMG" .. dmg)
 
 		return 0
 	end
