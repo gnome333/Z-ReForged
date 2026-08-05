@@ -73,9 +73,13 @@ local function legs(org, bone, dmg, dmgInfo, key, boneindex, dir, hit, ricochet)
 	local oldDmg = org[key]
 	local dmg = dmg * 4
 
+<<<<<<< HEAD
 	print("DMG: " .. dmg)
 
 	if dmgInfo:IsDamageType(DMG_CRUSH) or dmgInfo:IsDamageType(DMG_BUCKSHOT) and not dmgInfo:IsDamageType(DMG_BULLET) and dmg > 15 and not org[key.."amputated"] then
+=======
+	if dmgInfo:IsDamageType(DMG_CRUSH) and dmg > 4 and !org[key.."amputated"] then
+>>>>>>> ffe096232cf2a54ee18e91c57080698a88d9a24f
 		hg.organism.AmputateLimb(org, key)
 
 		return 0
@@ -132,7 +136,11 @@ local function arms(org, bone, dmg, dmgInfo, key, boneindex, dir, hit, ricochet)
 	local oldDmg = org[key]
 	local dmg = dmg * 4
 	
+<<<<<<< HEAD
 	if dmgInfo:IsDamageType(DMG_CRUSH) or dmgInfo:IsDamageType(DMG_BUCKSHOT) and not dmgInfo:IsDamageType(DMG_BULLET) and dmg > 15 and not org[key.."amputated"] then
+=======
+	if dmgInfo:IsDamageType(DMG_CRUSH) and dmg > 4 and !org[key.."amputated"] then
+>>>>>>> ffe096232cf2a54ee18e91c57080698a88d9a24f
 		hg.organism.AmputateLimb(org, key)
 
 		return 0
@@ -198,10 +206,13 @@ end
 
 local function spine(org, bone, dmg, dmgInfo, number, boneindex, dir, hit, ricochet)
 	if dmgInfo:IsDamageType(DMG_BLAST) then dmg = dmg / 3 end
+<<<<<<< HEAD
 	if dmgInfo:IsDamageType(DMG_BULLET) then dmg = dmg / 6 end
 	if dmgInfo:IsDamageType(DMG_BUCKSHOT) then dmg = dmg / 6 end
 	if dmgInfo:IsDamageType(DMG_FALL) then dmg = dmg * 6 end
 	if dmgInfo:IsDamageType(DMG_GENERIC) then dmg = dmg * 3 end
+=======
+>>>>>>> ffe096232cf2a54ee18e91c57080698a88d9a24f
 
 	local name = "spine" .. number
 	local name2 = "fake_spine" .. number
