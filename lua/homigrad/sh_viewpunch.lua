@@ -239,7 +239,7 @@ local IsValid = IsValid
 		function GetViewPunchAngles4()
 			local consmul = hg.CalculateConsciousnessMul()
 
-			return vp_punch_angle4 * (1 - consmul)
+			return vp_punch_angle4 * (0.4 - consmul)
 		end
 
 		function GetViewPunchVelocity()
