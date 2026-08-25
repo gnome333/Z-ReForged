@@ -795,7 +795,7 @@ function SWEP:SecondaryAttack()
 		if (IsValid(tr.Entity)) and self:CanPickup(tr.Entity) and not tr.Entity:IsPlayer() then
 			local Dist = (select(1, hg.eye(owner)) - tr.HitPos):Length()
 			--if Dist < self.ReachDistance then
-				sound.Play("Flesh.ImpactSoft", owner:GetShootPos(), 65, math.random(90, 110))
+				sound.Play("arccw_uc/common/punch-wall-04.ogg", owner:GetShootPos(), 65, math.random(90, 110))
 				self:SetCarrying(tr.Entity, tr.PhysicsBone, tr.HitPos, Dist)
 				tr.Entity.Touched = true
 				self:ApplyForce()
@@ -803,7 +803,7 @@ function SWEP:SecondaryAttack()
 		elseif IsValid(tr.Entity) and tr.Entity:IsPlayer() then
 			local Dist = (select(1, hg.eye(owner)) - tr.HitPos):Length()
 			if Dist < self.ReachDistance then
-				sound.Play("Flesh.ImpactSoft", owner:GetShootPos(), 65, math.random(90, 110))
+				sound.Play("weapons/fc5/pf_hit_humanoid_2.wav", owner:GetShootPos(), 65, math.random(90, 110))
 				owner:SetVelocity(owner:GetAimVector() * 20)
 				tr.Entity:SetVelocity((owner:KeyDown(IN_SPEED) and 1 or -1) * owner:GetAimVector() * 50)
 				self:SetNextSecondaryFire(CurTime() + .25)
@@ -1319,7 +1319,7 @@ function SWEP:Think()
 
 			if CLIENT then
 				if not self.blockSound then
-					sound.Play("pwb2/weapons/matebahomeprotection/mateba_cloth.wav", self:GetPos(), 65)
+					sound.Play("weapons/fc5/pf_osm_4.wav", self:GetPos(), 65)
 					self.blockSound = true
 					if self:IsClient() then
 						ViewPunch2(blockvp)
@@ -1330,7 +1330,7 @@ function SWEP:Think()
 			--HoldType = "camera"
 		else
 			if self.blockSound then
-				sound.Play("pwb2/weapons/mac11/draw.wav", self:GetPos(), 55)
+				sound.Play("weapons/fc5/pf_osm_2.wav", self:GetPos(), 55)
 				if self:IsClient() then
 					ViewPunch2(-blockvp)
 				end
@@ -1438,7 +1438,7 @@ function SWEP:PrimaryAttack(forcespecial)
 	self:SetNextSecondaryFire(CurTime() + .35 + (math.max(special_attack and 0.5 or 0, clawClasses[owner.PlayerClassName] or 0)))
 	self:SetLastShootTime(CurTime())
 
-	local snd, pitch = "weapons/slam/throw.wav", math.random(110, 120)
+	local snd, pitch = "weapons/fc5/pf_attack_"..math.random(3)..".wav", math.random(95, 110)
 	if owner.PlayerClassName == "headcrabzombie" then
 		snd, pitch = "npc/zombie/claw_miss"..math.random(2)..".wav", math.random(95, 110)
 	end
@@ -1481,10 +1481,10 @@ function SWEP:PrimaryAttack(forcespecial)
 end
 
 local concrete = {
-	"physics/concrete/boulder_impact_hard1.wav",
-	"physics/concrete/boulder_impact_hard2.wav",
-	"physics/concrete/boulder_impact_hard3.wav",
-	"physics/concrete/boulder_impact_hard4.wav"
+	"weapons/fc5/imp_player_meleepunch_concrete_1ch_v1_1.wav",
+	"weapons/fc5/imp_player_meleepunch_concrete_1ch_v1_2.wav",
+	"weapons/fc5/imp_player_meleepunch_concrete_1ch_v1_3.wav",
+	"weapons/fc5/imp_player_meleepunch_concrete_1ch_v1_4.wav"
 }
 
 local vent = {
@@ -1541,7 +1541,7 @@ function SWEP:AttackFront(special_attack, rand)
 		elseif self:IsEntSoft(Ent) then
 			SelfForce = 25
 			if Ent:IsPlayer() and IsValid(Ent:GetActiveWeapon()) and Ent:GetActiveWeapon().GetBlocking and Ent:GetActiveWeapon():GetBlocking() and not RagdollOwner(Ent) then
-				local snd = "Flesh.ImpactSoft"
+				local snd = "weapons/fc5/imp_player_meleepunch_concrete_1ch_v1_"..math.random(4)..".wav"
 				if isZomb then
 					snd = "npc/zombie/claw_strike"..math.random(3)..".wav"
 				elseif owner.PlayerClassName == "furry" then
@@ -1552,7 +1552,7 @@ function SWEP:AttackFront(special_attack, rand)
 					sound.Play("zbattle/berserk/unarmed" .. math.random(1, 9) .. ".wav", HitPos, 90, math.random(90, 110), 0.1 + owner.organism.berserk / 2)
 				end
 			else
-				local snd = "Flesh.ImpactHard"
+				local snd = "weapons/fc5/pf_hit_humanoid_4.wav"
 				if isZomb then
 					snd = "npc/zombie/claw_strike"..math.random(3)..".wav"
 				elseif owner.PlayerClassName == "furry" then
@@ -1575,7 +1575,7 @@ function SWEP:AttackFront(special_attack, rand)
 				end)
 			end
 		else
-			local snd = "Flesh.ImpactSoft"
+			local snd = "weapons/fc5/imp_player_meleepunch_default_1ch_v1_"..math.random(4)..".wav"
 			if isZomb then
 				snd = "npc/zombie/claw_strike"..math.random(3)..".wav"
 			elseif owner.PlayerClassName == "furry" then
