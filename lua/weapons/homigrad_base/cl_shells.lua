@@ -161,7 +161,7 @@ function hg.CreateMag( self, vel, bodygroups, bDontChangePhys )
 	local ang = matrix:GetAngles()
 	local pos, ang = LocalToWorld(lpos2, lang2, pos, ang)
 	ang:RotateAroundAxis(ang:Up(),-90)
-	local ent = ClientsideModel(self.MagModel or "models/weapons/upgrades/w_magazine_m1a1_30.mdl")
+	local ent = ClientsideModel(self.MagModel) if ent == nil then return " " end
 	hg_shelles[#hg_shelles+1] = ent
 	ent.RenderOverride = function(self)
 		if (LocalPlayer():EyePos() - self:GetPos()):LengthSqr() < 512*512 then -- так быстрее
