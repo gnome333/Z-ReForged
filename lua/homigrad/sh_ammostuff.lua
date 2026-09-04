@@ -1984,6 +1984,39 @@ hg.ammotypes = {
 			Icon = matPistolAmmo
 		}
 	},
+		[".50actionexpresshuy"] = {
+		name = ".50 Action Express HUY",
+		allowed = true,
+		dmgtype = DMG_AIRBOAT + DMG_DISSOLVE,
+		tracer = TRACER_LINE,
+		plydmg = 0,
+		npcdmg = 0,
+		force = 300,
+		maxcarry = 150,
+		minsplash = 24,
+		maxsplash = 24,
+		TracerSetings = {
+			TracerBody = Material("mats_jack_gmod_sprites/flamelet4"),
+			TracerTail = Material("particle/fireexplosion"),
+			TracerHeadSize = 100,
+			TracerLength = 105,
+			TracerWidth = 10.5,
+			TracerColor = Color(190, 147, 27),
+			TracerTPoint1 = 10.25,
+			TracerTPoint2 = 1,
+			TracerSpeed = 25000
+		},
+		BulletSettings = {
+			Damage = 300,
+			Force = 300,
+			Penetration = 16.6,
+			Shell = "50ae",
+			Speed = 100,
+			Diameter = 50.7,
+			Mass = 100,
+			Icon = matPistolAmmo
+		}
+	},
 	["7.62x51mm"] = {
 		name = "7.62x51 mm",
 		allowed = true,
@@ -2772,6 +2805,13 @@ local ammoents = {
 		Scale = 1,
 		Color = Color(245, 149, 5),
 		Count = 20,
+	},
+	[".50actionexpresshuy"] = {
+		Icon = "dejtriyev/smo/z_patch",
+		Material = "models/props/cs_militia/footlocker01_closed.mdl",
+		Scale = 2,
+		Color = Color(255, 187, 0, 208),
+		Count = 50,
 	},
 	["14.5x114mmbztm"] = {
 		Icon = "vgui/hud/bztmzcity",
