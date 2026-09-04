@@ -7,6 +7,32 @@ AddParticles("particles/muzzleflashes_test_b.pcf")
 AddParticles("particles/pcfs_jack_muzzleflashes.pcf")
 AddParticles("particles/ar2_muzzle.pcf")
 AddParticles( "particles/nmrih_extinguisher.pcf" )
+AddParticles("AC_muzzle_rifle")
+AddParticles("mw_fas2_muzzleflash_suppressed")
+AddParticles("particles/matin_catorce_muzzleflashes.pcf")
+PrecacheParticleSystem("AC_muzzle_rifle")
+PrecacheParticleSystem("mw_fas2_muzzleflash_suppressed")
+PrecacheParticleSystem("mw_ins2_shell_eject")
+PrecacheParticleSystem("mw_fas2_muzzleflash_ar_smoke_barrel")
+PrecacheParticleSystem("muzzleflash_pistol_red")
+PrecacheParticleSystem("muzzleflash_pistol_rbull")
+PrecacheParticleSystem("muzzleflash_4")
+PrecacheParticleSystem("muzzleflash_6")
+PrecacheParticleSystem("muzzleflash_ak74")
+PrecacheParticleSystem("muzzleflash_m24")
+PrecacheParticleSystem("muzzleflash_shotgun")
+PrecacheParticleSystem("muzzleflash_smg")
+PrecacheParticleSystem("muzzleflash_suppressed")
+PrecacheParticleSystem("muzzleflash_vollmer")
+PrecacheParticleSystem("muzzleflash_hmg")
+PrecacheParticleSystem("muzzleflash_p90")
+PrecacheParticleSystem("muzzleflash_mpx")
+
+PrecacheParticleSystem("muzzleflash_pistol_npc")
+PrecacheParticleSystem("muzzleflash_smg_npc")
+PrecacheParticleSystem("muzzleflash_shotgun_npc")
+PrecacheParticleSystem("muzzleflash_sniper_npc")
+PrecacheParticleSystem("muzzleflash_ar2_npc")
 
 local toPrecache = {
     "muzzleflash_SR25",
@@ -32,7 +58,8 @@ local toPrecache = {
     "muzzleflash_MINIMI",
     "muzzleflash_svd",
     "new_ar2_muzzle",
-    "NMRIH_EXTINGUISHER"
+    "NMRIH_EXTINGUISHER",
+    "matin_mw_muzzleflash_ak"
 }
 
 for k, v in ipairs(toPrecache) do
