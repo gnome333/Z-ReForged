@@ -795,7 +795,7 @@ function SWEP:SecondaryAttack()
 		if (IsValid(tr.Entity)) and self:CanPickup(tr.Entity) and not tr.Entity:IsPlayer() then
 			local Dist = (select(1, hg.eye(owner)) - tr.HitPos):Length()
 			--if Dist < self.ReachDistance then
-				sound.Play("arccw_uc/common/punch-wall-04.ogg", owner:GetShootPos(), 65, math.random(90, 110))
+				sound.Play("t10/wpn/ar/aking74/plr/fly/xsound_339bb79895cec5d.wav", owner:GetShootPos(), 65, math.random(90, 110))
 				self:SetCarrying(tr.Entity, tr.PhysicsBone, tr.HitPos, Dist)
 				tr.Entity.Touched = true
 				self:ApplyForce()
