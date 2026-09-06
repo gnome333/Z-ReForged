@@ -1044,7 +1044,7 @@ function SWEP:ApplyForce()
 							org.o2.curregen = math.Approach(org.o2.curregen, 0, (ply.Profession == "doctor" and 2 or 1))
 
 							if math.random(3) == 1 then
-								org.lungsfunction = true
+								org.heartstop = false
 							end
 
 							if math.random(50) == 1 and (ply.Profession != "doctor") then
@@ -1054,7 +1054,7 @@ function SWEP:ApplyForce()
 								hg.organism.input_list.chest(org, 1, 5, dmginfo)
 							end
 
-							if org.pulse > 15 then org.heartstop = false end
+							if org.pulse > 35 then org.heartstop = false end
 						end
 
 						phys:ApplyForceCenter(-vector_up * 6000)
