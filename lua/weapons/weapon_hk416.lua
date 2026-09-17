@@ -9,11 +9,14 @@ SWEP.Slot = 2
 SWEP.SlotPos = 10
 SWEP.ViewModel = ""
 SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
-SWEP.WorldModelFake = "models/weapons/zcity/v_416c.mdl"
+SWEP.WorldModelFake = "models/weapons/tacint_extras/v_hk416.mdl"
 
-SWEP.FakePos = Vector(-1.5, 2.5, 6.5)
-SWEP.FakeAng = Angle(0, 0, 0)
-SWEP.AttachmentPos = Vector(5,3.2,-22.05)
+SWEP.FakePos = Vector(-10, 2.42, 1.25)
+SWEP.FakeAng = Angle(0,0,0)
+
+SWEP.FakeAttachment = "muzzle"
+SWEP.FakeEjectBrassATT = "bolt"
+SWEP.AttachmentPos = Vector(-7,3,-22)
 SWEP.AttachmentAng = Angle(0,0,0)
 
 SWEP.CanEpicRun = false
@@ -31,8 +34,7 @@ SWEP.FakeEmptyReloadSounds = {
 	[0.25] = "weapons/m4a1/m4a1_magout.wav",
 	[0.37] = "weapons/m4a1/m4a1_magrelease.wav",
 	[0.65] = "weapons/m4a1/m4a1_magain.wav",
-	[0.77] = "weapons/m4a1/m4a1_hit.wav",
-	[0.95] = "weapons/m4a1/m4a1_boltarelease.wav",
+	[0.92] = "myt_ins1/m203-open.wav",
 }
 SWEP.MagModel = "models/weapons/arc9/darsu_eft/mods/mag_stanag_fn_mk16_std_556x45_30.mdl"
 
@@ -69,13 +71,13 @@ if CLIENT then
 	}
 end
 SWEP.AnimList = {
-	["idle"] = "base_idle",
-	["reload"] = "base_reload",
-	["reload_empty"] = "base_reloadempty",
+	["idle"] = "idle",
+	["reload"] = "reload",
+	["reload_empty"] = "reload",
 }
 
-SWEP.WepSelectIcon2 = Material("vgui/inventory/weapon_hk416c")
-SWEP.IconOverride = "vgui/inventory/weapon_hk416c"
+SWEP.WepSelectIcon2 = Material("entities/tacrp_ar_hk416.png")
+SWEP.IconOverride = "entities/tacrp_ar_hk416.png"
 
 SWEP.CustomShell = "556x45"
 --SWEP.EjectPos = Vector(-5,0,-5)
@@ -94,37 +96,23 @@ SWEP.Primary.Damage = 44
 SWEP.Primary.Spread = 0
 SWEP.Primary.Force = 44
 
-SWEP.Primary.Sound = {"zcitysnd/sound/weapons/firearms/mil_m16a4/m16_fire_01.wav", 75, 90, 100, 2}
+SWEP.Primary.Sound = {"tacint_extras/hk416/m4a1_unsil-1.wav", 75, 90, 100, 2}
 SWEP.Primary.SoundEmpty = {"zcitysnd/sound/weapons/mk18/handling/mk18_empty.wav", 75, 105, 110, CHAN_WEAPON, 2}
-SWEP.DistSound = "zcitysnd/sound/weapons/mk18/mk18_dist.wav"
+SWEP.DistSound = "myt_ins1_sd/smg2.wav"
 SWEP.Primary.Wait = 0.063
 
 SWEP.availableAttachments = {
 	barrel = {
-		[1] = {"supressor2", Vector(0,0,0), {}},
+		[1] = {"supressor2", Vector(5,0,0), {}},
 		[2] = {"supressor6", Vector(0,0,0), {}},
 		["mount"] = Vector(-6,0.5,0.24),
-	},
-	sight = {
-		["mount"] = { ironsight = Vector(-18.5, 1.58, 0.05), picatinny = Vector(-17, 1.51, 0.09)},
-		["mountType"] = {"picatinny", "ironsight"},
-		["empty"] = {
-			"empty",
-		},
 	},
 	grip = {
 		["mount"] = Vector(6, 0.2, 0.1),
 		["mountType"] = "picatinny"
 	},
-	underbarrel = {
-		["mount"] = {["picatinny_small"] = Vector(3, 0.2, -1.65),["picatinny"] = Vector(8,.5,0.2)},
-		["mountAngle"] = {["picatinny_small"] = Angle(-1, 0, 180),["picatinny"] = Angle(0, 0.5, 0)},
-		["mountType"] = {"picatinny_small","picatinny"},
-		["noblock"] = true,
-	}
+
 }
-
-
 SWEP.ReloadTime = 5.2
 SWEP.ReloadSoundes = {
 	"none",
@@ -143,10 +131,10 @@ SWEP.ReloadSoundes = {
 	"none"
 }
 
-SWEP.FakeMagDropBone = 71
+SWEP.FakeMagDropBone = 58
 
 SWEP.HoldType = "rpg"
-SWEP.ZoomPos = Vector(-9, -0.041, 5.0141)
+SWEP.ZoomPos = Vector(4, -1.78, 5.900)
 
 --local to head
 SWEP.RHPos = Vector(2,-7,3.5)
@@ -163,14 +151,14 @@ function SWEP:AnimationPost()
 	self:BoneSet("l_finger02", Vector(0, 0, 0), Angle(0, 15, 0))
 end
 
-SWEP.LocalMuzzlePos = Vector(22,0,3.25)
-SWEP.LocalMuzzleAng = Angle(0,0,0)
+SWEP.PPSMuzzleEffect = "muzzleflash_M3"
+
+SWEP.LocalMuzzlePos = Vector(20,-1.9,3)
+SWEP.LocalMuzzleAng = Angle(0,-0.3,0)
 SWEP.WeaponEyeAngles = Angle(0,0,0.002)
 
 SWEP.attPos = Vector(0, -3.25, 22)
 SWEP.attAng = Angle(0, 0, 0)
-
-SWEP.StartAtt = {"ironsight1"}
 
 SWEP.Ergonomics = 1
 
