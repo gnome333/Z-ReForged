@@ -166,8 +166,8 @@ for i = 1, 30 do
 	SWEP.Spray[i] = Angle(-0.02 - math.cos(i) * 0.03, math.cos(i * i) * 0.02, 0) * 1.5
 end
 
-SWEP.WepSelectIcon2 = Material("pwb/sprites/aks74u.png")
-SWEP.IconOverride = "entities/arc9_eft_aks74u.png"
+SWEP.WepSelectIcon2 = Material("entities/arc9_ump45_ins1_aks74u.png")
+SWEP.IconOverride = "entities/arc9_ump45_ins1_aks74u.png"
 
 SWEP.Ergonomics = 1
 SWEP.WorldPos = Vector(5, -0.8, -1.1)
