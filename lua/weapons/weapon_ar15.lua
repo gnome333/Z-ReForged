@@ -114,7 +114,7 @@ SWEP.availableAttachments = {
 		[2] = {"supressor6", Vector(0,0,0), {}},
 		["mount"] = Vector(1,0.35,0.25),
 	},
-	sight = {
+--[[	sight = {
 		["empty"] = {
 			"empty",
 			{
@@ -127,7 +127,7 @@ SWEP.availableAttachments = {
 		["removehuy"] = {
 			[1] = "null"
 		}
-	},
+	}, ]]
 	grip = {
 		["mount"] = Vector(9, 1.2, 1.7),
 		["mountType"] = "picatinny",
