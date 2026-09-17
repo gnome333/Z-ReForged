@@ -9,22 +9,22 @@ SWEP.Slot = 2
 SWEP.SlotPos = 10
 SWEP.ViewModel = ""
 SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
-SWEP.WorldModelFake = "models/weapons/arccw/c_ud_m16.mdl"
+SWEP.WorldModelFake = "models/weapons/ump45_ins1/c_rif_m16a4.mdl"
 
 SWEP.FakePos = Vector(-12, 2.81, 6)
 SWEP.FakeAng = Angle(0, 0, 0.1)
 SWEP.AttachmentPos = Vector(3.8,2.1,-27.8)
 SWEP.AttachmentAng = Angle(0,0,0)
-SWEP.FakeAttachment = "1"
-SWEP.FakeBodyGroups = "00100100000"
-SWEP.ZoomPos = Vector(0, -0.0027, 4.6866)
+SWEP.FakeAttachment = "muzzle"
+--SWEP.FakeBodyGroups = "00100100000"
+SWEP.ZoomPos = Vector(0, 0.200, 4.80)
 
 SWEP.GunCamPos = Vector(4,-15,-6)
 SWEP.GunCamAng = Angle(190,-5,-100)
 
 SWEP.FakeEjectBrassATT = "2"
 
-SWEP.FakeViewBobBone = "CAM_Homefield"
+SWEP.FakeViewBobBone = "Weapon_Controller"
 SWEP.FakeReloadSounds = {
 	[0.22] = "weapons/universal/uni_crawl_l_03.wav",
 	[0.29] = "weapons/arccw_ud/m16/grab.ogg",
@@ -46,32 +46,32 @@ SWEP.FakeEmptyReloadSounds = {
 	[0.59] = "weapons/arccw_ud/m16/grab.ogg",
 	[0.62] = "weapons/arccw_ud/m16/magin.ogg",
 
-	[0.83] = "weapons/arccw_ud/m16/magtap.ogg",
+	[0.83] = "myt_ins1/m203-open.wav",
 	[1.01] = "weapons/universal/uni_crawl_l_04.wav",
 }
 
-SWEP.availableAttachments = {
+--[[ SWEP.availableAttachments = {
 	sight = {
 		["mountType"] = {"dovetail","picatinny"},
 		["mount"] = {["dovetail"] = Vector(-25, 2.5, -0.45),["picatinny"] = Vector( -25.21, 2.72, -0.25 )},
 	},
-}
+} ]]
 
 SWEP.FakeViewBobBone = "ValveBiped.Bip01_R_Hand"
 SWEP.FakeViewBobBaseBone = "ValveBiped.Bip01_L_UpperArm"
 SWEP.ViewPunchDiv = 70
 
 SWEP.AnimList = {
-	["idle"] = "idle",
-	["reload"] = "reload_20",
-	["reload_empty"] = "reload_empty_20",
+	["idle"] = "m16a4_idle",
+	["reload"] = "m16a4_reload",
+	["reload_empty"] = "m16a4_reload_empty",
 }
 
 SWEP.lmagpos = Vector(0,0,0)
 SWEP.lmagang = Angle(0,0,0)
 SWEP.lmagpos2 = Vector(3,9.5,-16.5)
 SWEP.lmagang2 = Angle(0,0,-90)
-SWEP.FakeMagDropBone = 52
+SWEP.FakeMagDropBone = 99
 
 if CLIENT then
 	local vector_full = Vector(1,1,1)
@@ -118,13 +118,6 @@ if CLIENT then
 	}
 end
 
-function SWEP:ModelCreated(model)
-	if CLIENT and self:GetWM() and not isbool(self:GetWM()) and isstring(self.FakeBodyGroups) then
-		self:GetWM():ManipulateBoneScale(55, vector_origin)
-		self:GetWM():SetBodyGroups(self.FakeBodyGroups)
-	end
-end
-
 SWEP.ReloadHold = nil
 SWEP.FakeVPShouldUseHand = false
 
@@ -146,7 +139,7 @@ SWEP.Primary.Cone = 0
 SWEP.Primary.Damage = 35
 SWEP.Primary.Spread = 0
 SWEP.Primary.Force = 35
-SWEP.Primary.Sound = {"m16a4/m16a4_fp.wav", 75, 120, 140}
+SWEP.Primary.Sound = {"myt_ins1/m16a4-01.wav", 75, 120, 140}
 SWEP.Primary.SoundEmpty = {"zcitysnd/sound/weapons/ak74/handling/ak74_empty.wav", 75, 100, 105, CHAN_WEAPON, 2}
 SWEP.Primary.Wait = 0.045
 SWEP.ReloadTime = 4.3
@@ -163,10 +156,10 @@ SWEP.ReloadSoundes = {
 	"none"
 }
 
-SWEP.PPSMuzzleEffect = "pcf_jack_mf_mrifle2" -- shared in sh_effects.lua
+SWEP.PPSMuzzleEffect = "muzzleflash_M3" -- shared in sh_effects.lua
 
 SWEP.LocalMuzzlePos = Vector(24.985,-0.11,1.395)
-SWEP.LocalMuzzleAng = Angle(-0.2,0,0)
+SWEP.LocalMuzzleAng = Angle(0.4,0,0)
 SWEP.WeaponEyeAngles = Angle(0,0,0)
 
 SWEP.HoldType = "rpg"
@@ -191,7 +184,7 @@ SWEP.attPos = Vector(0.25, -2.1, 28)
 SWEP.attAng = Angle(0, 0.4, 0)
 SWEP.lengthSub = 25
 SWEP.handsAng = Angle(1, -1.5, 0)
-SWEP.DistSound = "m16a4/m16a4_dist.wav"
+SWEP.DistSound = "myt_ins1/m16a4-01_echo.wav"
 
 
 
@@ -207,18 +200,6 @@ SWEP.LHAng = Angle(-110,-180,0)
 local finger1 = Angle(25,0, 40)
 
 SWEP.ShootAnimMul = 3
-function SWEP:DrawPost()
-	local wep = self:GetWeaponEntity()
-	self.vec = self.vec or Vector(0,0,0)
-	local vec = self.vec
-	if CLIENT and IsValid(wep) then
-		self.shooanim = Lerp(FrameTime()*15,self.shooanim or 0,self.ReloadSlideOffset)
-		vec[1] = 0 * self.shooanim
-		vec[2] = 0 * self.shooanim
-		vec[3] = -2 * self.shooanim
-		wep:ManipulateBonePosition(46,vec,false)
-	end
-end
 
 -- Inspect Assault
 
