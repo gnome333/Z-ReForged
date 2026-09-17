@@ -9,15 +9,15 @@ SWEP.Slot = 2
 SWEP.SlotPos = 10
 SWEP.ViewModel = ""
 SWEP.WorldModel = "models/weapons/w_rif_ak47.mdl"
-SWEP.ZoomPos = Vector(0, -0.0517, 5.1843)
-SWEP.WorldModelFake = "models/weapons/arccw/c_ur_ak.mdl"
+SWEP.ZoomPos = Vector(0, 0.5, 5.1)
+SWEP.WorldModelFake = "models/weapons/ump45_ins1/c_rif_aks74u.mdl"
 
-SWEP.FakePos = Vector(-11, 2.42, 6.25)
-SWEP.FakeAng = Angle(0.5, 0.6, 5.5)
+SWEP.FakePos = Vector(-10, 2.42, 6.25)
+SWEP.FakeAng = Angle(0,0,0)
 SWEP.AttachmentPos = Vector(-4.5,2.4,-19.3)
 SWEP.AttachmentAng = Angle(0,0,0)
-SWEP.FakeAttachment = "1"
-SWEP.FakeBodyGroups = "06901135412000"
+SWEP.FakeAttachment = "muzzle"
+--SWEP.FakeBodyGroups = "06901135412000"
 
 SWEP.GunCamPos = Vector(4,-15,-6)
 SWEP.GunCamAng = Angle(190,-5,-100)
@@ -53,14 +53,14 @@ SWEP.FakeViewBobBaseBone = "ValveBiped.Bip01_L_UpperArm"
 SWEP.ViewPunchDiv = 70
 
 SWEP.AnimList = {
-	["idle"] = "idle",
-	["reload"] = "reload",
-	["reload_empty"] = "reload_empty",
+	["idle"] = "aks74u_idle",
+	["reload"] = "aks74u_reload",
+	["reload_empty"] = "aks74u_reload_empty",
 }
 
-SWEP.FakeMagDropBone = 57
+SWEP.FakeMagDropBone = 6
 
-SWEP.MagModel = "models/weapons/arc9/darsu_eft/mods/mag_ak74_izhmash_6l23_545x39_30.mdl"
+SWEP.MagModel = "models/weapons/arc9/darsu_eft/mods/mag_ak74_izhmash_6l18_545x39_45.mdl"
 SWEP.lmagpos = Vector(0,0,0)
 SWEP.lmagang = Angle(0,0,0)
 SWEP.lmagpos2 = Vector(0,0,1)
@@ -116,7 +116,7 @@ function SWEP:ModelCreated(model)
 	if CLIENT and self:GetWM() and not isbool(self:GetWM()) and isstring(self.FakeBodyGroups) then
 		self:GetWM():ManipulateBoneScale(57, vector_origin)
 		self:GetWM():ManipulateBoneScale(58, vector_origin)
-		self:GetWM():SetBodyGroups(self.FakeBodyGroups)
+		--self:GetWM():SetBodyGroups(self.FakeBodyGroups)
 	end
 end
 
@@ -139,7 +139,7 @@ SWEP.Primary.Cone = 0
 SWEP.Primary.Damage = 35
 SWEP.Primary.Spread = 0
 SWEP.Primary.Force = 35
-SWEP.Primary.Sound = {"zcitysnd/sound/weapons/aks74u/aks_fp.wav", 75, 120, 140}
+SWEP.Primary.Sound = {"myt_ins1/aks74u-fire.wav", 75, 120, 140}
 SWEP.Primary.SoundEmpty = {"zcitysnd/sound/weapons/ak74/handling/ak74_empty.wav", 75, 100, 105, CHAN_WEAPON, 2}
 SWEP.Primary.Wait = 0.075
 SWEP.ReloadTime = 5.5
@@ -155,7 +155,7 @@ SWEP.ReloadSoundes = {
 	"none"
 }
 
-SWEP.PPSMuzzleEffect = "pcf_jack_mf_mrifle1" -- shared in sh_effects.lua
+SWEP.PPSMuzzleEffect = "AC_muzzle_rifle" -- shared in sh_effects.lua
 
 SWEP.HoldType = "rpg"
 SWEP.RHandPos = Vector(-12, -1, 4)
@@ -177,36 +177,17 @@ SWEP.attPos = Vector(-0.05, -2.5, 19)
 SWEP.attAng = Angle(0.3, 0.4, 0)
 SWEP.lengthSub = 25
 SWEP.handsAng = Angle(1, -1.5, 0)
-SWEP.DistSound = "zcitysnd/sound/weapons/aks74u/aks_dist.wav"
+SWEP.DistSound = "myt_ins1/aks74u-echo.wav"
 
 SWEP.LocalMuzzlePos = Vector(18.982,0.149,2.633)
-SWEP.LocalMuzzleAng = Angle(-0.25,0.4,0)
+SWEP.LocalMuzzleAng = Angle(0,0,1)
 SWEP.WeaponEyeAngles = Angle(0,0,0)
 
 SWEP.availableAttachments = {
-	sight = {
-		["mountType"] = {"picatinny", "dovetail"},
-		["mount"] = {["dovetail"] = Vector(-15, 2.5, -0.1),["picatinny"] = Vector(-16, 3.4, 0.25)},
-	},
-	mount = {
-		["picatinny"] = {
-			"mount3",
-			Vector(-13.5, 0.75, -0.78),
-			{},
-			["mountType"] = "picatinny",
-		},
-		["dovetail"] = {
-			"empty",
-			Vector(0, 0, 0),
-			{},
-			["mountType"] = "dovetail",
-		},
-	},
 	barrel = {
-		[1] = {"supressor1", Vector(0,0,0), {}},
-		[2] = {"supressor8", Vector(0,0,0), {}},
-		["mount"] = Vector(-2.5,1,0.45),
-		["mountAngle"] = Angle(0,-1.5,0)
+		[1] = {"supressor1", Vector(3,0.6,-0.5), {}},
+		[2] = {"supressor8", Vector(5,0.1,-0.8), {}},
+		["mount"] = Vector(-1.6,0,1,-0.2),
 	},
 }
 
@@ -223,7 +204,7 @@ local finger1 = Angle(25,0, 40)
 
 SWEP.ShootAnimMul = 3
 
-function SWEP:DrawPost()
+--[[function SWEP:DrawPost()
 	local wep = self:GetWeaponEntity()
 	self.vec = self.vec or Vector(0,0,0)
 	local vec = self.vec
@@ -234,7 +215,7 @@ function SWEP:DrawPost()
 		vec[3] = 0*self.shooanim
 		wep:ManipulateBonePosition(8,vec,false)
 	end
-end
+end]]
 
 local lfang2 = Angle(0, -15, -1)
 local lfang1 = Angle(-5, -5, -5)
