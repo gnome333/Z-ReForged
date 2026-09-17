@@ -240,18 +240,6 @@ SWEP.LHAng = Angle(-110,-180,0)
 local finger1 = Angle(25,0, 40)
 
 SWEP.ShootAnimMul = 3
-function SWEP:DrawPost()
-	local wep = self:GetWeaponEntity()
-	self.vec = self.vec or Vector(0,0,0)
-	local vec = self.vec
-	if CLIENT and IsValid(wep) then
-		self.shooanim = Lerp(FrameTime()*15,self.shooanim or 0,self.ReloadSlideOffset)
-		vec[1] = 0*self.shooanim
-		vec[2] = 1*self.shooanim
-		vec[3] = 0*self.shooanim
-		wep:ManipulateBonePosition(8,vec,false)
-	end
-end
 
 local lfang2 = Angle(0, -15, -1)
 local lfang1 = Angle(-5, -5, -5)
