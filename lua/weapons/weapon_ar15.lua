@@ -213,18 +213,6 @@ function SWEP:ThinkAdd()
 	end
 end
 SWEP.ShootAnimMul = 3
-function SWEP:DrawPost()
-	local wep = self:GetWeaponEntity()
-	self.vec = self.vec or Vector(0,0,0)
-	local vec = self.vec
-	if CLIENT and IsValid(wep) then
-		self.shooanim = Lerp(FrameTime()*15,self.shooanim or 0,self.ReloadSlideOffset)
-		vec[1] = 0*self.shooanim
-		vec[2] = 0*self.shooanim
-		vec[3] = -2*self.shooanim
-		wep:ManipulateBonePosition(46,vec,false)
-	end
-end
 
 SWEP.lengthSub = 5
 SWEP.holsteredPos = Vector(5, 8, -4)
